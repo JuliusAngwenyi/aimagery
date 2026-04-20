@@ -77,3 +77,16 @@ Navigate into the generated project folder (the one containing `package.json`) a
 
 ### Test: 
 Open `http://localhost:3000` and confirm the app renders. Then go back to your Sitecore environment, open the Standalone extension point where your app is registered, and reload — it should now show the scaffolded content instead of an error.
+
+# Troubleshooting
+You may encounter the following error when Generating Images
+`Generation failed: The requested model is deprecated and no longer supported by provider hf-inference`
+
+## Cause
+`stabilityai/stable-diffusion-xl-base-1.0` has been removed from the `hf-inference` provider. 
+HuggingFace deprecated several older Stable Diffusion models from their hosted inference, so the router rejects the request before it even runs.
+
+## Fix
+switch to `black-forest-labs/FLUX.1-schnell`, which is explicitly supported by the HF Inference API provider, is Apache-2.0 licensed, and produces significantly better images in fewer steps.
+This is within the code file [`route.ts`](/app/api/generate-image/route.ts)
+
