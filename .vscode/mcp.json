@@ -1,0 +1,17 @@
+{
+	"servers": {
+		"shadcn": {
+			"command": "npx",
+			"args": [
+				"shadcn@latest",
+				"mcp"
+			],
+			"type": "stdio"
+		},
+		"sitecore-documentation-docs": {
+			"type": "http",
+			"url": "https://sitecore.mcp.kapa.ai"
+		}
+	},
+	"inputs": []
+}
