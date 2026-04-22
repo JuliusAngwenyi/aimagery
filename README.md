@@ -13,7 +13,7 @@ I have followed the steps, and this repository is the final output of a fully fu
 
 - Scaffold Marketplace app in local dev ![Scaffold Marketplace app in local dev](/docs/02-scaffold-marektplace-app-local-dev.png)
 
-- Vanilla Marketplace app running in Page Editor![Vanilla Marketplace app running in Page Editor](/docs/https://github.com/JuliusAngwenyi/aimagery/blob/main/docs/03-vanilla-marketplace-app-in-pageeditor.png)
+- Vanilla Marketplace app running in Page Editor ![Vanilla Marketplace app running in Page Editor](/docs/03-vanilla-marketplace-app-in-pageeditor.png)
 
 - Vibe Coding in VS Code ![Vibe Coding in VS Code](/docs/04-vibecoding-image-generator-in-vscode.png)
 
