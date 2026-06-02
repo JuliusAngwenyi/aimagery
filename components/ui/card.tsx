@@ -15,7 +15,7 @@ const cardVariants = cva(
         md: "shadow-md hover:shadow-lg focus-visible:shadow-lg",
         lg: "shadow-lg hover:shadow-xl focus-visible:shadow-xl",
       },
-      style: {
+      appearance: {
         flat: "bg-body-bg border-transparent",
         outline: "bg-body-bg border-border-color",
         filled: "bg-subtle-bg border-transparent",
@@ -28,12 +28,12 @@ const cardVariants = cva(
     },
     defaultVariants: {
       elevation: "none",
-      style: "flat",
+      appearance: "flat",
       padding: "lg",
     },
     compoundVariants: [
       {
-        style: "outline",
+        appearance: "outline",
         class: "shadow-none hover:shadow-base focus-visible:shadow-base",
       },
     ],
@@ -43,14 +43,14 @@ const cardVariants = cva(
 function Card({
   className,
   elevation,
-  style,
+  appearance,
   padding,
   ...props
 }: React.ComponentProps<"div"> & VariantProps<typeof cardVariants>) {
   return (
     <div
       data-slot="card"
-      className={cn(cardVariants({ elevation, style, padding }), className)}
+      className={cn(cardVariants({ elevation, appearance, padding }), className)}
       {...props}
     />
   );

@@ -1,10 +1,26 @@
+import { NextRequest, NextResponse } from "next/server";
+
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-import { NextRequest, NextResponse } from "next/server";
-
 const HF_URL =
   "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell";
+
+const MAX_PROMPT_LENGTH = 2000;
+
+interface GenerateImageRequestBody {
+  prompt: string;
+}
+
+function isValidRequestBody(body: unknown): body is GenerateImageRequestBody {
+  return (
+    typeof body === "object" &&
+    body !== null &&
+    "prompt" in body &&
+    typeof (body as Record<string, unknown>).prompt === "string" &&
+    (body as GenerateImageRequestBody).prompt.trim().length > 0
+  );
+}
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   // --- Input validation ---
@@ -14,21 +30,22 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
- 
-  if (
-    !body ||
-    typeof body !== "object" ||
-    !("prompt" in body) ||
-    typeof (body as Record<string, unknown>).prompt !== "string" ||
-    !(body as { prompt: string }).prompt.trim()
-  ) {
+
+  if (!isValidRequestBody(body)) {
     return NextResponse.json(
       { error: "A prompt string is required" },
       { status: 400 },
     );
   }
 
-  const { prompt } = body as { prompt: string };
+  const { prompt } = body;
+
+  if (prompt.length > MAX_PROMPT_LENGTH) {
+    return NextResponse.json(
+      { error: `Prompt must be ${MAX_PROMPT_LENGTH} characters or fewer` },
+      { status: 400 },
+    );
+  }
 
   // --- Build request headers ---
   const headers: Record<string, string> = {
@@ -103,7 +120,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       detail,
     );
     return NextResponse.json(
-      { error: `Generation failed: ${detail}` },
+      { error: "Image generation failed. Please try again later." },
       { status: hfResponse.status },
     );
   }

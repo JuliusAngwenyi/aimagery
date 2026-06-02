@@ -27,16 +27,21 @@ export const MarketplaceProvider: React.FC<ClientSDKProviderProps> = ({
   const [client, setClient] = useState<ClientSDK | null>(null);
   const [appContext, setAppContext] = useState<ApplicationContext | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (client) {
-      client.query("application.context").then((res) => {
-        if (res?.data) {
-          setAppContext(res.data);
-          console.log("appContext", res.data);
-        }
-      });
+      client
+        .query("application.context")
+        .then((res) => {
+          if (res?.data) {
+            setAppContext(res.data);
+          }
+        })
+        .catch((err) => {
+          console.error("Error loading application context:", err);
+          setError("Error loading Marketplace application context");
+        });
     }
   }, [client]);
 
@@ -47,11 +52,10 @@ export const MarketplaceProvider: React.FC<ClientSDKProviderProps> = ({
         modules: [XMC],
       };
       try {
-        setLoading(true);
-        const client = await ClientSDK.init(config);
-        setClient(client);
-      } catch (error) {
-        console.error("Error initializing client SDK", error);
+        const sdk = await ClientSDK.init(config);
+        setClient(sdk);
+      } catch (err) {
+        console.error("Error initializing client SDK:", err);
         setError("Error initializing client SDK");
       } finally {
         setLoading(false);
@@ -72,7 +76,8 @@ export const MarketplaceProvider: React.FC<ClientSDKProviderProps> = ({
         <div>{error}</div>
         <div>
           Please check if the client SDK is loaded inside Sitecore Marketplace
-          parent window and you have properly set your app's extention points.
+          parent window and you have properly set your app&apos;s extension
+          points.
         </div>
       </div>
     );
@@ -99,7 +104,7 @@ export const useMarketplaceClient = () => {
   const context = useContext(ClientSDKContext);
   if (!context) {
     throw new Error(
-      "useMarketplaceClient must be used within a ClientSDKProvider",
+      "useMarketplaceClient must be used within a MarketplaceProvider",
     );
   }
   return context;
@@ -108,7 +113,7 @@ export const useMarketplaceClient = () => {
 export const useAppContext = () => {
   const context = useContext(AppContextContext);
   if (!context) {
-    throw new Error("useAppContext must be used within a ClientSDKProvider");
+    throw new Error("useAppContext must be used within a MarketplaceProvider");
   }
   return context;
 };

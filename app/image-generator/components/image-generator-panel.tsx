@@ -35,6 +35,7 @@ interface HistoryEntry {
 
 const HISTORY_KEY = "image-generator-history";
 const HISTORY_LIMIT = 5;
+const MAX_RETRIES = 3;
 
 function loadHistory(): HistoryEntry[] {
   try {
@@ -62,6 +63,7 @@ export function ImageGeneratorPanel() {
   const [error, setError] = useState<string | null>(null);
   const [retryCountdown, setRetryCountdown] = useState<number | null>(null);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [retryCount, setRetryCount] = useState<number>(0);
 
   // Load history from localStorage once on mount (client-only).
   useEffect(() => {
@@ -90,7 +92,7 @@ export function ImageGeneratorPanel() {
     };
   }, []);
 
-  const generate = useCallback(async (promptText: string) => {
+  const generate = useCallback(async (promptText: string, attempt = 0) => {
     setIsGenerating(true);
     setError(null);
 
@@ -107,7 +109,7 @@ export function ImageGeneratorPanel() {
         setImageUrl(data.imageUrl);
         lastGeneratedPromptRef.current = promptText;
         setError(null);
-        // Prepend to history, deduplicate by prompt, cap at limit.
+        setRetryCount(0);
         setHistory((prev) => {
           const filtered = prev.filter((e) => e.prompt !== promptText);
           const next = [{ prompt: promptText, imageUrl: data.imageUrl! }, ...filtered].slice(0, HISTORY_LIMIT);
@@ -118,16 +120,22 @@ export function ImageGeneratorPanel() {
       }
 
       if (response.status === 503 && typeof data.retryAfter === "number") {
+        if (attempt >= MAX_RETRIES) {
+          setError("Model is still loading after multiple retries. Please try again later.");
+          setRetryCount(0);
+          return;
+        }
+
         const seconds = data.retryAfter;
         setRetryCountdown(seconds);
+        setRetryCount(attempt + 1);
 
         intervalRef.current = setInterval(() => {
           setRetryCountdown((prev) => {
             if (prev === null || prev <= 1) {
               clearInterval(intervalRef.current!);
               intervalRef.current = null;
-              // Auto-retry when the countdown hits zero.
-              generate(promptText);
+              generate(promptText, attempt + 1);
               return null;
             }
             return prev - 1;
@@ -233,7 +241,10 @@ export function ImageGeneratorPanel() {
             {retryCountdown !== null ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="size-4 animate-spin" />
-                <span>Model loading, retrying in {retryCountdown}s…</span>
+                <span>
+                  Model loading, retrying in {retryCountdown}s (attempt{" "}
+                  {retryCount}/{MAX_RETRIES})…
+                </span>
               </div>
             ) : (
               <Button
@@ -254,7 +265,7 @@ export function ImageGeneratorPanel() {
           </form>
 
           {error && (
-            <Alert variant="destructive">
+            <Alert variant="danger">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
@@ -290,9 +301,9 @@ export function ImageGeneratorPanel() {
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">Recent generations</p>
               <div className="flex gap-2 flex-wrap">
-                {history.map((entry, i) => (
+                {history.map((entry) => (
                   <button
-                    key={i}
+                    key={entry.prompt}
                     type="button"
                     title={entry.prompt}
                     onClick={() => {

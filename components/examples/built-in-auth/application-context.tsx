@@ -1,3 +1,5 @@
+"use client";
+
 import { useAppContext } from "@/components/providers/marketplace";
 import { Badge } from "@/components/ui/badge";
 import { CardTitle } from "@/components/ui/card";
