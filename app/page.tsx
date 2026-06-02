@@ -4,7 +4,7 @@ import { ApplicationContext } from "@/components/examples/built-in-auth/applicat
 import { ListLanguagesFromClientSdk } from "@/components/examples/built-in-auth/with-xmc/list-languages";
 import { Separator } from "@/components/ui/separator";
 
-function Examples() {
+export default function HomePage() {
   return (
     <div className="container mx-auto p-6 space-y-8 max-w-3xl">
       <div className="space-y-4">
@@ -30,5 +30,3 @@ function Examples() {
     </div>
   );
 }
-
-export default Examples;

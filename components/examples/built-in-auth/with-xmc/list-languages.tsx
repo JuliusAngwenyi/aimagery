@@ -47,10 +47,8 @@ export const ListLanguagesFromClientSdk = () => {
       const languagesResponse = await client.query("xmc.sites.listLanguages", {
         params: data,
       });
-      console.log("languages from client", languagesResponse);
       setLanguages(languagesResponse.data?.data ?? []);
     } catch (err) {
-      console.log("error from client", err);
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
@@ -58,7 +56,7 @@ export const ListLanguagesFromClientSdk = () => {
   };
 
   return (
-    <Card style={"outline"}>
+    <Card appearance="outline">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           Client SDK Example
@@ -98,8 +96,8 @@ export const ListLanguagesFromClientSdk = () => {
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Language names:</p>
               <div className="flex flex-wrap gap-1">
-                {languages.map((language, index) => (
-                  <Badge key={index}>{language.name}</Badge>
+                {languages.map((language) => (
+                  <Badge key={language.name}>{language.name}</Badge>
                 ))}
               </div>
             </div>

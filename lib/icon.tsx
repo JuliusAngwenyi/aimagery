@@ -11,16 +11,21 @@ type IconProps = SVGProps<SVGSVGElement> & {
 export function Icon({
   path,
   title,
-  size = 1,
+  size = 24,
   className,
   fill = "currentColor",
   ...rest
 }: IconProps) {
+  const numericSize = typeof size === "string" ? parseFloat(size) || 24 : size;
+
   return (
     <svg
-      transform={`scale(${size})`}
+      width={numericSize}
+      height={numericSize}
       viewBox="0 0 24 24"
+      aria-hidden={!title}
       aria-label={title}
+      role={title ? "img" : undefined}
       className={className}
       {...rest}
     >

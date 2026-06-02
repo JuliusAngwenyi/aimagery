@@ -51,8 +51,7 @@ function Alert({
       {variant && (
         <Icon
           path={variantIcons[variant]}
-          size={1.2}
-          className="text-current"
+          className="size-4 text-current"
         />
       )}
       {props.children}
