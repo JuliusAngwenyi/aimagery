@@ -10,10 +10,27 @@ export default defineConfig({
     },
   },
   test: {
-    environment: "jsdom",
-    setupFiles: ["./vitest.setup.ts"],
-    include: ["**/*.test.{ts,tsx}"],
-    pool: "threads",
     fileParallelism: false,
+    projects: [
+      {
+        test: {
+          name: "ui",
+          environment: "jsdom",
+          setupFiles: ["./vitest.setup.ts"],
+          include: [
+            "lib/**/*.test.{ts,tsx}",
+            "components/**/*.test.{ts,tsx}",
+            "app/**/*.test.tsx",
+          ],
+        },
+      },
+      {
+        test: {
+          name: "api",
+          environment: "node",
+          include: ["app/**/*.test.ts"],
+        },
+      },
+    ],
   },
 });
